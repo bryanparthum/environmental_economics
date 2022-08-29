@@ -1,2 +1,2 @@
-# environmental_economics
+# Environmental Economics
 An undergraduate course in environmental economics
