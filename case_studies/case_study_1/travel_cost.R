@@ -30,7 +30,7 @@ stargazer(RecreationDemand,
           title  = 'Table 1: Summary Statistics',
           digits = 1,
           type   = 'html',
-          out    = 'travel_cost/output/summary_statistics.html')
+          out    = 'output/summary_statistics.html')
 
 ## next, we will run a glm model. What is a glm model? 
 ## Copy the one-sentence Description of the model into your response document.
@@ -73,12 +73,15 @@ stargazer(pois, ## the poisson model from above
           title  = 'Table 2: Travel Cost Regression Results',
           digits = 2,
           type   = 'html',
-          out    = 'travel_cost/output/travel_cost_results.html')
+          out    = 'output/travel_cost_results.html')
 
 
 
+##########################
+## optional extensions, no points
+##########################
 
-## Optional: These are other regression specifications that can be used on these data. 
+## These are other regression specifications that can be used on these data. 
 ## Feel free to explore on your own, but they are not part of the case study.
 
 ## hurdle models
