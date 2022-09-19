@@ -8,7 +8,7 @@ As mentioned [above](#requirements), this case study requires the use of the *R*
 *Github* is free and available for download [here](https://github.com/git-guides/install-git). *Github* is used to house this repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of this repository, unzip in the desired location on your machine, and follow the replication procedures outlined below.
 
 # Cloning the Repository
-Begin by either cloning this repository or downloading the zipped file. Cloning can be done from the [main page of this repo](https://github.com/bryanparthum/environmental_economics) by clicking on the green "code" button in the top right corner of the page and following those instructions (this will also provide you with an option to download a .zip file of the repository), or by navigating in the terminal to the desired location of the clone and then typing: 
+To clone or download this repository, navigate to the [main page of this repo](https://github.com/bryanparthum/environmental_economics) and click on the green "code" button in the top right corner of the page and follow the instructions (this will also provide you with an option to download a .zip file of the repository). Alternatively, navigate in the command line terminal to where you would like to clone the repository and then type: 
 
 ```
 git clone https://github.com/bryanparthum/environmental_economics

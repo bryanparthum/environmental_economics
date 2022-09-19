@@ -27,7 +27,7 @@ As mentioned [above](#requirements), this case study requires the use of the *R*
 *Github* is free and available for download [here](https://github.com/git-guides/install-git). *Github* is used to house the course repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of the repository (instructions below) and unzip in the desired location on your machine.
 
 # Cloning the Repository (25 points)
-Begin by either cloning the [course repository](https://github.com/bryanparthum/environmental_economics) or downloading the zipped file. Cloning can be done from the [main page of the course repository](https://github.com/bryanparthum/environmental_economics) by clicking on the green "code" button in the top right corner of the page and following those instructions (this will also provide you with an option to download a .zip file of the repository), or by navigating in the terminal to the desired location of the clone and then typing: 
+To clone or download the [course repository](https://github.com/bryanparthum/environmental_economics), navigate to the [main page](https://github.com/bryanparthum/environmental_economics) and click on the green "code" button in the top right corner of the page and follow the instructions (this will also provide you with an option to download a .zip file of the repository). Alternatively, navigate in the command line terminal to where you would like to clone the repository and then type:
 
 ```
 git clone https://github.com/bryanparthum/environmental_economics
@@ -56,7 +56,7 @@ Explore what this data set is by typing:
 ? RecreationDemand
 ```
 
-The question mark `?` is really useful in *R* whenever we want to access the help file for something. For example, typing `? library` will automatically bring you to the help file for loading packages. When the help command (`?`) is included in a code chunk of a Rmarkdown document, it opens your internet browser to the relevant help file.
+The question mark `?` is really useful in *R* whenever we want to access the help file for something. For example, typing `? library` will automatically bring you to the help file for loading packages. When the help command (`?`) is included in a code chunk of a Rmarkdown document, it opens your internet browser to the relevant help file. If you would like to stop it from opening the browser every time you `knit` this markdown document, simply either comment the line of code out by putting a hashtag `#` in front of the command, or by adding `eval = FALSE` in the header of the code chunk. 
 
 Continue by answering the following questions and adding your responses to this markdown document.
 
@@ -167,6 +167,6 @@ Using Table \ref{tab:results}, answer the questions below.
     
   - Answer: 
 
-11. (5 points) What is the marginal willingness to pay for lake quality at Sommerville Lake? Recall, this is the ratio of two coefficients (preference parameters). 
+11. (5 points) What is the average marginal willingness to pay for lake quality at Sommerville Lake under each of the models? Recall, this is the ratio of two coefficients (preference parameters). 
     
   - Answer: 
