@@ -18,16 +18,16 @@ library(AER)          ## this packages provides the data
 ```
 
 # Case Study #1 - The Travel Cost Model (100 points)
-This repo provides instructions, code, and data to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/case_study_1/papers/Seller_et_al_1985_LandEcon-travel_cost.pdf).
+This markdown document provides instructions, code, and data to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/case_study_1/papers/Seller_et_al_1985_LandEcon-travel_cost.pdf).
 
 # Install R and Rstudio (25 points)
-As mentioned [above](#requirements), this case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* will provide you with a welcoming environment (an integrated development environment, or IDE) that is useful for replication. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
+As mentioned [above](#requirements), this case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* provides a welcoming environment (an integrated development environment, or IDE) that is useful for replication and allows use of the Rmarkdown functionality. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
 
 # Optional: Install GitHub (0 points)
-*Github* is free and available for download [here](https://github.com/git-guides/install-git). *Github* is used to house this repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of this repository, unzip in the desired location on your machine, and follow the replication procedures outlined below.
+*Github* is free and available for download [here](https://github.com/git-guides/install-git). *Github* is used to house the course repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of the repository (instructions below) and unzip in the desired location on your machine.
 
 # Cloning the Repository (25 points)
-Begin by either cloning this repository or downloading the zipped file. Cloning can be done from the [main page of this repo](https://github.com/bryanparthum/environmental_economics) by clicking on the green "code" button in the top right corner of the page and following those instructions (this will also provide you with an option to download a .zip file of the repository), or by navigating in the terminal to the desired location of the clone and then typing: 
+Begin by either cloning the [course repository](https://github.com/bryanparthum/environmental_economics) or downloading the zipped file. Cloning can be done from the [main page of the course repository](https://github.com/bryanparthum/environmental_economics) by clicking on the green "code" button in the top right corner of the page and following those instructions (this will also provide you with an option to download a .zip file of the repository), or by navigating in the terminal to the desired location of the clone and then typing: 
 
 ```
 git clone https://github.com/bryanparthum/environmental_economics
@@ -36,9 +36,9 @@ git clone https://github.com/bryanparthum/environmental_economics
 If you chose to download a .zip file of the repository, simply unzip it to wherever you would like to have it and proceed with the following steps in that directory.
 
 # The Travel Cost Model 
-To get started with the replication, navigate in your file explorer (or equivalent) to `case_studies/case_study_1` and double click on (open) the markdown file `travel_cost.Rmd`. This will prompt your machine to open the file in *RStudio*. This markdown document includes all the instructions and code to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/travel_cost/Seller_et_al_1985_LandEcon-travel_cost.pdf).
+To get started with the replication (after installing *R*, *RStudio*, and cloning/downloading the repository), navigate in your file explorer (or equivalent) to `case_studies\case_study_1` and double click on (open) the markdown file `travel_cost.Rmd`. This will prompt your machine to open the file in *RStudio*. This markdown document includes all the instructions and code to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/case_study_1/Seller_et_al_1985_LandEcon-travel_cost.pdf).
 
-You can run individual code sections or lines by navigating in the section of code marked with `{r}` and hit the `Run` button at the top of the code editor (other options in its drop down menu), or use a keyboard shortcut and type `Ctrl + Enter` (on a Mac, type `Cmd + Return`). The Keyboard shortcuts are really handy for running the code line-by-line. Whatever line the cursor is on, regardless of where the cursor is on that line, can be run by simply typing `Ctrl + Enter` (on a Mac, type `Cmd + Return`). 
+You can run individual code sections or lines by navigating into any code section ("chunk") marked with `{r}` and hit the `Run` button at the top of the code editor, or use a keyboard shortcut and type `Ctrl + Enter` (on a Mac, type `Cmd + Return`). The Keyboard shortcuts are really handy for running the code line-by-line. Whatever line the cursor is on, regardless of where the cursor is on that line, can be run by simply typing `Ctrl + Enter` (on a Mac, type `Cmd + Return`). 
 
 Running individual lines is useful when testing the commands, but the entire markdown document (compete with code chunks) is ran by hitting the `Knit` button at the top of the page (this is called "knitting"). When you `knit` a document, it will run all the text and all the code and populate a output file (in this case, a .pdf). **This output file is what you will submit for your case study.**
 
@@ -56,7 +56,7 @@ Explore what this data set is by typing:
 ? RecreationDemand
 ```
 
-The question mark `?` is really useful in *R* whenever we want to access the help file for something. For example, typing `? library` will automatically bring you to the help file for loading packages. When help command (the `?`) are included in an Rmarkdown document it opens your browser to the relevant help file.
+The question mark `?` is really useful in *R* whenever we want to access the help file for something. For example, typing `? library` will automatically bring you to the help file for loading packages. When the help command (`?`) is included in a code chunk of a Rmarkdown document, it opens your internet browser to the relevant help file.
 
 Continue by answering the following questions and adding your responses to this markdown document.
 
