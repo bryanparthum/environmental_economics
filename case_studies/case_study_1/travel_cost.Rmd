@@ -1,0 +1,172 @@
+---
+title: 'Case Study #1 - The Travel Cost Model'
+author: 'PUT YOUR NAME HERE'
+date: "9/19/2022"
+output: pdf_document
+fontsize: 11pt
+geometry: margin = 1in
+linkcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)    ## this package is used for data manipulation and management
+library(stargazer)    ## this package provides easy exporting of summary tables (statistics and regression tables) 
+library(MASS)         ## this packages provides the statistical framework for the regressions
+library(pscl)         ## this packages provides the statistical framework for the regressions
+library(AER)          ## this packages provides the data
+```
+
+# Case Study #1 - The Travel Cost Model (100 points)
+This repo provides instructions, code, and data to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/case_study_1/papers/Seller_et_al_1985_LandEcon-travel_cost.pdf).
+
+# Install R and Rstudio (25 points)
+As mentioned [above](#requirements), this case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* will provide you with a welcoming environment (an integrated development environment, or IDE) that is useful for replication. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
+
+# Optional: Install GitHub (0 points)
+*Github* is free and available for download [here](https://github.com/git-guides/install-git). *Github* is used to house this repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of this repository, unzip in the desired location on your machine, and follow the replication procedures outlined below.
+
+# Cloning the Repository (25 points)
+Begin by either cloning this repository or downloading the zipped file. Cloning can be done from the [main page of this repo](https://github.com/bryanparthum/environmental_economics) by clicking on the green "code" button in the top right corner of the page and following those instructions (this will also provide you with an option to download a .zip file of the repository), or by navigating in the terminal to the desired location of the clone and then typing: 
+
+```
+git clone https://github.com/bryanparthum/environmental_economics
+```
+
+If you chose to download a .zip file of the repository, simply unzip it to wherever you would like to have it and proceed with the following steps in that directory.
+
+# The Travel Cost Model 
+To get started with the replication, navigate in your file explorer (or equivalent) to `case_studies/case_study_1` and double click on (open) the markdown file `travel_cost.Rmd`. This will prompt your machine to open the file in *RStudio*. This markdown document includes all the instructions and code to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/travel_cost/Seller_et_al_1985_LandEcon-travel_cost.pdf).
+
+You can run individual code sections or lines by navigating in the section of code marked with `{r}` and hit the `Run` button at the top of the code editor (other options in its drop down menu), or use a keyboard shortcut and type `Ctrl + Enter` (on a Mac, type `Cmd + Return`). The Keyboard shortcuts are really handy for running the code line-by-line. Whatever line the cursor is on, regardless of where the cursor is on that line, can be run by simply typing `Ctrl + Enter` (on a Mac, type `Cmd + Return`). 
+
+Running individual lines is useful when testing the commands, but the entire markdown document (compete with code chunks) is ran by hitting the `Knit` button at the top of the page (this is called "knitting"). When you `knit` a document, it will run all the text and all the code and populate a output file (in this case, a .pdf). **This output file is what you will submit for your case study.**
+
+Next, load the data set: 
+
+```{r load-data}
+## load data
+data(RecreationDemand)
+```
+
+Explore what this data set is by typing: 
+
+```{r help-data}
+## look at the help file
+? RecreationDemand
+```
+
+The question mark `?` is really useful in *R* whenever we want to access the help file for something. For example, typing `? library` will automatically bring you to the help file for loading packages. When help command (the `?`) are included in an Rmarkdown document it opens your browser to the relevant help file.
+
+Continue by answering the following questions and adding your responses to this markdown document.
+
+1. (5 points) What are the data that you just loaded? Copy the `Description` from the help file. 
+
+  - Description: 
+
+Export the table of summary statistics from the data using the `stargazer` package.
+
+```{r summary, results = 'asis'}
+## export summary statistics 
+stargazer(RecreationDemand, 
+          title  = 'Summary Statistics',
+          digits = 1,
+          dep.var.labels.include = FALSE,
+          type   = 'latex',
+          header = FALSE)
+```
+
+2. (5 points) What was the total number of respondents (observations)? 
+    
+   - Answer:
+        
+3. (5 points) What was the average number of trips taken? 
+        
+   - Answer:
+        
+4. (5 points) What was the average cost of a trip to Sommerville Lake? (this is the `costS` variable) And the other two substitute lakes? (Conroe Lake = `costC` and Houston Lake = `costH`)
+    
+   - Answer:
+
+Next, find out what the generalized linear model is.  
+
+```{r help-glm}
+## what is a generalized linear model? 
+? glm
+```
+
+5. (5 points) What is a glm model? Copy and paste the description of the model from the help file. 
+    
+   - Description: 
+    
+You will estimate two other models as well. Find out what the negative binomial model is and what the zero-inflated model is.
+
+```{r help}
+## what is a negative binomial model? 
+? glm.nb
+
+## what is a zero-inflated model? 
+? zeroinfl
+```
+
+6. (5 points) What is a glm.nb model? Copy and paste the description of the model from the help file. 
+    
+   - Desription: 
+        
+7. (5 points) What is a zeroinfl model? Copy and paste the description of the model from the help file. 
+    
+   - Desription: 
+
+Next, run the generalized linear model (`glm`), the negative binomial model (`glm.nb`), and the zero-inflated model (`zeroinfl`). Look at the regression output summaries.
+
+```{r models}
+## run the model generalized linear model
+glm <- glm(trips ~ costS + costC + costH + quality + ski + income + userfee,
+            data   = RecreationDemand,                                        
+            family = poisson)                                                
+
+## look at the summary output
+summary(glm)
+
+## run the negative binomial model
+nb <- glm.nb(trips ~ costS + costC + costH + quality + ski + income + userfee, 
+             data = RecreationDemand)
+
+## look at the summary output
+summary(nb)
+
+## run the zero-inflated poisson
+zi <- zeroinfl(trips ~  costS + costC + costH + quality + ski + income + userfee | quality + income, 
+               data = RecreationDemand)
+
+## look at the summary output
+summary(zi)
+```
+
+Export the regression outputs to a table using the `stargazer` package.
+
+```{r results, results = 'asis'}
+## export summary statistics
+stargazer(glm,
+          nb,   
+          zi,   
+          title  = 'Travel Cost Regression Results',
+          digits = 2,
+          type   = 'latex',
+          header = FALSE, 
+          label  = "tab:results")
+```
+
+Using Table \ref{tab:results}, answer the questions below.
+
+9. (5 points) What are the coefficients interpreted as? Recall, they are the partial derivatives of the utility function. 
+    
+  - Answer: 
+
+10. (5 points) Are the coefficients on the cost variables as expected? Recall, `costS` is the own price (the price of visiting Sommerville Lake), and the other two cost variable `costC` and `costH` are the price of visiting the "substitute" lakes. 
+    
+  - Answer: 
+
+11. (5 points) What is the marginal willingness to pay for lake quality at Sommerville Lake? Recall, this is the ratio of two coefficients (preference parameters). 
+    
+  - Answer: 
