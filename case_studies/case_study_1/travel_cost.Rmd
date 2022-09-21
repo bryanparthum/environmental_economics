@@ -1,7 +1,7 @@
 ---
 title: 'Case Study #1 - The Travel Cost Model'
 author: 'PUT YOUR NAME HERE'
-date: "9/19/2022"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
 output: pdf_document
 fontsize: 11pt
 geometry: margin = 1in
@@ -10,11 +10,15 @@ linkcolor: blue
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)    ## this package is used for data manipulation and management
-library(stargazer)    ## this package provides easy exporting of summary tables (statistics and regression tables) 
-library(MASS)         ## this packages provides the statistical framework for the regressions
-library(pscl)         ## this packages provides the statistical framework for the regressions
-library(AER)          ## this packages provides the data
+## This function will check if a package is installed, and if not, install it
+list.of.packages <- c('tidyverse', ## this package is used for data manipulation and management
+                      'stargazer', ## this package provides easy exporting of summary tables (statistics and regression tables) 
+                      'MASS',      ## this package provides the statistical framework for the regressions
+                      'pscl',      ## this package provides the statistical framework for the regressions
+                      'AER')       ## this package provides the data
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages, repos = "http://cran.rstudio.com/")
+lapply(list.of.packages, library, character.only = TRUE)
 ```
 
 # Case Study #1 - The Travel Cost Model (100 points)
@@ -24,7 +28,7 @@ This markdown document provides instructions, code, and data to estimate a trave
 As mentioned [above](#requirements), this case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* provides a welcoming environment (an integrated development environment, or IDE) that is useful for replication and allows use of the Rmarkdown functionality. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
 
 # Optional: Install GitHub (0 points)
-*Github* is free and available for download [here](https://github.com/git-guides/install-git). *Github* is used to house the course repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of the repository (instructions below) and unzip in the desired location on your machine.
+*Github* is free and available for download [here](https://desktop.github.com/). *Github* is used to house the course repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of the repository (instructions below) and unzip in the desired location on your machine.
 
 # Cloning the Repository (25 points)
 To clone or download the [course repository](https://github.com/bryanparthum/environmental_economics), navigate to the [main page](https://github.com/bryanparthum/environmental_economics) and click on the green "code" button in the top right corner of the page and follow the instructions (this will also provide you with an option to download a .zip file of the repository). Alternatively, navigate in the command line terminal to where you would like to clone the repository and then type:
