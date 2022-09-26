@@ -2,7 +2,7 @@
 This repo provides instructions, code, and data to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/case_study_1/papers/Seller_et_al_1985_LandEcon-travel_cost.pdf).
 
 # Install R and RStudio
-As mentioned [above](#requirements), this case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* provides a welcoming environment (an integrated development environment, or IDE) that is useful for replication and allows use of the *Rmarkdown* functionality. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
+This case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* provides a welcoming environment (an integrated development environment, or IDE) that is useful for replication and allows use of the *Rmarkdown* functionality. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
 
 # Optional: Install GitHub
 *Github* is free and available for download [here](https://desktop.github.com/). *Github* is used to house this repository and by installing and using it to clone the repository one will simplify the replication procedure. However, you could also simply download a zipped file version of this repository, unzip in the desired location on your machine, and follow the replication procedures outlined below.
@@ -18,3 +18,6 @@ If you chose to download a .zip file of the repository, simply unzip it to where
 
 # The Travel Cost Model 
 To get started with the replication (after installing *R*, *RStudio*, and cloning/downloading the repository), navigate in your file explorer (or equivalent) to `environmental_economics\case_studies\case_study_1` and double click on (open) the markdown file `travel_cost.Rmd`. This will prompt your machine to open the file in *RStudio*. The markdown document includes all the instructions and code to estimate a travel cost model from [Seller, Stoll, and Chavas (1985)](https://bryanparthum.github.io/environmental_economics/case_studies/case_study_1/Seller_et_al_1985_LandEcon-travel_cost.pdf). Follow the steps outlined in the markdown document, and submit the resulting .pdf for grading. The points for each step are stated next to each graded section.
+
+# License
+The software code contained within this repository is made available under the [MIT license](http://opensource.org/licenses/mit-license.php). Any data and figures are made available under the [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/) license.
