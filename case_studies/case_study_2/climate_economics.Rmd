@@ -1,0 +1,177 @@
+---
+title: 'Case Study #2 - The Climate-Economy Model'
+author: 'PUT YOUR NAME HERE'
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: pdf_document
+fontsize: 11pt
+geometry: margin = 1in
+linkcolor: blue
+---
+
+```{r setup, include = FALSE}
+## This function will check if a package is installed, and if not, install it
+list.of.packages <- c('tidyverse',           ## this package is used for data manipulation and management
+                      # 'kable','kableExtra',  ## this package makes nice tables in markdown
+                      'ggplot2','ggrepel')   ## these packages provide useful tools for plotting 
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages, repos = "http://cran.rstudio.com/")
+lapply(list.of.packages, library, character.only = TRUE)
+```
+
+# Case Study #2 - The Climate-Economy Model (100 points)
+This markdown document provides instructions and code to estimate a staple Integrated Assessment Model (IAM), the Dynamic Integrated Climate-Economy model (DICE). DICE was originally developed by by 2018 Nobel Laureate [William Nordhaus](https://en.wikipedia.org/wiki/William_Nordhaus) that integrates in the neoclassical economics, carbon cycle, climate science, and estimated impacts allowing the weighing of subjectively guessed costs and subjectively guessed benefits of taking steps to slow climate change.
+
+# Getting Started
+The repository's main [README](README.md) has instructions for installing [*R*](https://www.r-project.org/) and [*RStudio*](https://www.rstudio.com/products/rstudio/), installing [*Github*](https://desktop.github.com/), and cloning the [course repository](https://github.com/bryanparthum/environmental_economics). Please refer to those instructions if you have not done so.
+
+# The Climate-Economy Model
+To get started with the replication (after installing *R*, *RStudio*, and cloning/downloading the repository), navigate in your file explorer (or equivalent) to `case_studies\case_study_2` and double click on (open) the markdown file `climate_economics.Rmd`. This will prompt your machine to open the file in *RStudio*. This markdown document includes all the instructions and code to estimate a commonly-used Integrated Assessment Model (IAM) DICE2016R as outlined in "[Revisiting the social cost of carbon](https://www.pnas.org/doi/epdf/10.1073/pnas.1609244114)" (Nordhaus 2017). Parameters and functions are drawn directly from the GAMS code for DICE2016R. The model written here does not require any additional solvers as it is not a constrained optimization problem but, instead, a simple representation of the model intended on lowering barriers for first-time users and to serve as an educational tool only.   
+
+## Getting Acquainted with the Model Parameters (25 points)
+Begin by familiarizing yourself with the model's code. Open the script `dice2016.R`. There are approximately 200 parameters in the model, so it can be overwhelming at first. As a start, we can see that the model as written runs for 60 time periods: 
+
+```{r}
+## time horizon (5 years per period)
+time_horizon = 60
+```
+
+1. (5 points) If the model begins in 2015, what is the terminal time period? (i.e., the last year of the model)
+
+  - Answer:
+
+In the next line we define something called `fosslim`. This constraint comes from earlier research suggesting that all of the feasible fossil fuel reserves on the planet sum to approximately 6,000 GtC.
+
+```{r}
+## availability of fossil fuels
+fosslim  = 6000   # maximum cumulative extraction fossil fuels (GtC)
+```
+
+2. (5 points) Why might it make sense to include a constraint such as this in the model?
+
+  - Answer:
+ 
+The next lines define the preference parameters `elastmu` (elasticity of marginal utility of consumption, often denoted by the greek letter `eta` ($\eta$)) and `prstp` (the social time preference per year, often denoted by the greek letter `rho` ($\rho$)). These two parameters are critical in estimating the present value of future damages (a useful metric for benefit-cost analyses) and are described by many to be the normative or "ethical" parameters in many climate IAMs. While that isn't always the case as they can also be estimated using real-world observations in a positive framework (see, for example [Newell et al. (2022)](https://media.rff.org/documents/Newell_Pizer_Prest_21-16.pdf) for recent advances), it is true that a researcher can "select" different values and have a large effect on the resulting present value. 
+
+```{r}
+## preferences
+elasmu   = 1.45  # elasticity of marginal utility of consumption
+prstp    = .015  # initial rate of social time preference per year
+```
+
+Recall from your introductory economics courses that the elasticity of the marginal utility of consumption $\eta$ traces out the path of the utility gained from an extra unit of consumption. When that elasticity is equal to one ("unity"), a richer person benefits from an additional unit of consumption the same as a poorer person. The pure rate of time preference parameter $\rho$ dictates the degree to which we value the current more than the future. 
+
+Using your understanding of diminishing marginal utilities and intertemporal preferences, answer the following questions: 
+
+3. (5 points) Following standard utility theory, if the marginal utility of consumption should be decreasing in consumption (rich people value an extra dollar less than a poor person), should $\eta$ be greater than or less than 1?
+
+  - Answer:
+  
+3. (5 points) The parameter $\eta$ serves two important roles. It captures preferences for current consumption periods, but it also serves as an intertemporal preference parameter. Why might $\eta$ also serve as an intertemporal preference parameter? 
+
+  - Answer:
+  
+4. (5 points) Is $\rho=0.015$ (or 1.5%) consistent with how you approach your daily decisions? Can you provide some intuition behind why it is likely appropriate to have a $\rho$ greater than 0?
+
+  - Answer:
+  
+The model continues by defining a bunch of parameters. It is probably useful to walk through the code line-by-line and familiarize yourself with what coding an IAM looks like. Most of the syntax and code is generalizeable to other contexts, so it is good to introduce yourself to these things. The model includes parameters for the socioeconomics (population and growth in gross domestic product), greenhouse gas emissions, the climate module, damage functions, and discounting module. And concludes with a few functions to estimate the social cost of carbon dioxide. In the next section we will run the model, examine the results, make some changes, and compare the outcomes and the model's sensitivities to our assumptions.
+
+## The Social Cost of Carbon Dioxide (SC-CO2) (75 points)
+To recover a social cost of carbon dioxide (SC-CO2) for a given emissions year, the model must first be ran once to estimate the total stream of undiscounted climate damages (this is the baseline model). Then, a researcher adds a pulse of emissions (in this case, 1 gigatonne of $CO_2$) to the emissions in that year and re-estimates the model to recover a new stream of undiscounted damages. By subtracting the two streams of damages (and applying some simple transformations) one can recover an undiscounted stream of marginal damages. "Marginal" in this case to mean damages that are attributable to only the additional 1 tonne pulse of $CO_2$. 
+
+Let's begin by running the model: 
+```{r, warning = F, message = F}
+## run the model
+source('dice2016.R')
+```
+
+The model script has returned two objects to our coding environment: 1) an object named `baseline` that contains the baseline temperature trajectories and GDP-loss (climate damages) as a percent of exogenous GDP, and 2) an object names `results` that contains the SC-CO2 in each emissions year from 2020 to 2100 in 10-year intervals. 
+
+Let's start by taking a look at the baseline climate damages (as a % of exogenous GDP) as a function temperature. This is best examined in a plot: 
+
+```{r, echo = F, warning = F, fig.cap="\\label{fig:baseline_dice2016}The GDP-Temperature Relationship in DICE2016"} 
+## plot
+baseline %>%
+  ggplot() +
+  geom_line(aes(x     = gmst,
+                y     = gdp.loss),
+            size  = 1) +
+  geom_segment(aes(x = 0, xend = 6.6, y = 0, yend = 0), color = NA, linetype = 'dashed', size = 0.3) +
+  scale_x_continuous(breaks = seq(0, 6, 1),
+                     limits = c(0, 6.6)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 6),
+                     labels = scales::percent_format(accuracy = 1)) +
+  labs(x     = 'Change in Global Mean Surface Temperature',
+       y     = 'GDP-loss (%)') +
+  theme_minimal() +
+  theme(legend.position  = 'none',
+        axis.title       = element_text(size = 14),
+        axis.text        = element_text(size = 14),
+        axis.line.x      = element_line(color = "black"),
+        axis.ticks.x     = element_line(color = "black", size=1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = 'grey70', linetype = "dotted"),
+        panel.grid.minor = element_blank())
+```
+
+5. (5 points) The x-axis is the change in global mean surface temperature relative to pre-industrial time (1850-1900). Why would it appear that in the year 2015 the line starts just below the 1 degree mark on the x-axis and not at 0? 
+
+  - Answer: 
+  
+6. (5 points) The y-axis is the estimated loss in GDP relative to a world without climate damages. Recent global pledges such as the Paris agreement propose that staying under a 2 degree world is paramount for society and they are willing to go to great lengths to obtain this target. Looking at the plot, what are the estimated damages to GDP if we reached a 2 degree world? 
+
+  - Answer: 
+  
+7. (5 points) Knowing what we know about losses to GDP in a 2 degree world (your answer from above), do you think these benefits alone justify the costs of reaching a 2 degree world? 
+
+  - Answer:
+  
+8. (5 points) You have read [Revisiting the social cost of carbon](https://www.pnas.org/doi/epdf/10.1073/pnas.1609244114) which contains the explicit representation of climate damages (the damage function) in equation 3. Using that damage function and the damage parameter coefficients specified in the model (lines 82-85 in `dice2016.R`), estimate exactly the GDP-loss corresponding to a 2 degree world. 
+
+  - Answer: 
+  
+9. (10 points) The damage function has received a lot of criticism. Provide some arguments both for and against its use in informing environmental policy. 
+
+  - Answer: 
+
+
+We now have a path of SC
+```{r}
+knitr::kable(results[, c('year', 'scco2')], 
+             digits    = 0, 
+             col.names = c('Emissions Year', 'SC-CO2'))
+```
+
+```{r, echo = F, warning = F, fig.cap="\\label{fig:scco2_dice2016}The SC-CO2 at a 3% Discount Rate"} 
+## plot
+results %>%
+  ggplot() +
+  geom_line(aes(x     = year,
+                y     = scco2,
+                color = Damages),
+            size  = 1) +
+  geom_label_repel(aes(x     = case_when(year == 2100 ~ year, TRUE ~ NA_real_),
+                       y     = scco2,
+                       color = Damages,
+                       label = Damages),
+                   size         = 3,
+                   max.overlaps = 10,
+                   nudge_x      = 10) +
+  geom_segment(aes(x = 2020, xend = 2100, y = 0, yend = 0), color = NA, linetype = 'dashed', size = 0.3) +
+  scale_x_continuous(breaks = seq(2020, 2100, 20),
+                     limits = c(2020, 2100)) +
+  scale_y_continuous(breaks = seq(0, 350, 50),
+                     limits = c(0, 350),
+                     labels = scales::dollar_format()) +
+  labs(x     = 'Emissions Year',
+       y     = 'SC-CO2 (2020$)') +
+  theme_minimal() +
+  theme(legend.position  = 'none',
+        axis.title       = element_text(size = 14),
+        axis.text        = element_text(size = 14),
+        axis.line.x      = element_line(color = "black"),
+        axis.ticks.x     = element_line(color = "black", size=1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = 'grey70', linetype = "dotted"),
+        panel.grid.minor = element_blank())
+```
