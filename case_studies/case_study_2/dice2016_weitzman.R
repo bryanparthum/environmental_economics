@@ -4,22 +4,16 @@
 #################  library
 ##########################
 
-## Clear worksace
-rm(list = ls())
-gc()
-
-## This function will check if a package is installed, and if not, install it
-list.of.packages <- c('magrittr','tidyverse',
-                      'ggplot2','ggrepel','wesanderson','scales')
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages, repos = "http://cran.rstudio.com/")
-lapply(list.of.packages, library, character.only = TRUE)
+# install.packages('tidyverse')
+# install.packages('magrittr')
+# library(tidyverse)
+# library(magrittr)
 
 ##########################
 ############  define model
 ##########################
 
-## time periods (5 years per period)
+## time horizon (5 years per period)
 time_horizon = 60
 
 ## availability of fossil fuels
@@ -89,8 +83,6 @@ fco22x   = 3.6813    # forcings of equilibrium co2 doubling (wm-2)
 a1       = 0         # damage intercept
 a2       = 0.00236   # damage quadratic term
 a3       = 2.00      # damage exponent
-a4       = 5.07e-6   # Weitzman damage term
-a5       = 6.754     # damage exponent Weitzman 2012
 
 ## abatement cost
 expcost2 = 2.6       # exponent of control cost function
@@ -131,14 +123,14 @@ scale2   = -10993.704           # additive scaling coefficient
 ## atfrac[t]     atmospheric share since 1850
 ## atfrac2010[t]     atmospheric share since 2010 ;
 
-# parameters for long-run consistency of carbon cycle
+## parameters for long-run consistency of carbon cycle
 b11 = 1 - b12
 b21 = b12*mateq/mueq
 b22 = 1 - b21 - b23
 b32 = b23*mueq/mleq
 b33 = 1 - b32
 
-# further definitions of parameters
+## further definitions of parameters
 a20       = a2
 sig0      = e0/(q0*(1-miu0))
 lam       = fco22x/t2xco2
@@ -170,11 +162,11 @@ for (t in 2:time_horizon) {
 
 ## set the baseline emission controls to match DICE2016 R2
 cpricebase = cprice0*(1+gcprice)^((0:(time_horizon-1))*5)
-miu = (cpricebase/pbacktime)^(1/(expcost2-1))
+miu        = (cpricebase/pbacktime)^(1/(expcost2-1))
 miu[(tnopol+1):length(miu)] = limmiu
 
 ## function to run the model 
-run_dice = function(perturbation_year=-1,damfun) {
+run_dice = function(perturbation_year = -1) {
   
   ## definitions
   ## damfrac[t]      damages as fraction of gross output
@@ -219,12 +211,7 @@ run_dice = function(perturbation_year=-1,damfun) {
   for (t in 1:time_horizon) {
     
     ## equation for damage fraction
-    if (missing(damfun)) {
-      damfrac[t] = a1*tatm[t]+a2*tatm[t]^a3
-    }
-    else if (damfun=="Weitzman") {
-      damfrac[t] = (a1*tatm[t]+a2*tatm[t]^a3+a4*tatm[t]^a5)/(1+a1*tatm[t]+a2*tatm[t]^a3+a4*tatm[t]^a5)
-    }
+    damfrac[t] = a1*tatm[t]+a2*tatm[t]^a3
     
     ## output gross equation
     ygross[t] = (al[t]*(l[t]/1000)^(1-gama))*(k[t]^gama)
@@ -250,6 +237,7 @@ run_dice = function(perturbation_year=-1,damfun) {
     ## industrial emissions
     eind[t] = sigma[t]*ygross[t]*(1-(miu[t]))
     
+    ## perturb emissions
     if (perturbation_year==(2015+t*tstep))
       eind[t] = eind[t]+1
     
@@ -280,141 +268,46 @@ run_dice = function(perturbation_year=-1,damfun) {
   }
   
   ## return consumption
-  return(c)
+  return(list(consumption = c, gmst = tatm[1:60], gdp.loss = damfrac))
   
 }
 
 ## function to get the scc
-get_scc = function(perturbation_year,discount_rate=.03,damfun) {
+get_scc = function(perturbation_year, discount_rate = 0.03) {
   
   ## equation for damage fraction
-  if (missing(damfun)) {
-    c_base = run_dice()
-    c_perturb = run_dice(perturbation_year)
-  }
-  else if (damfun=="Weitzman") {
-    c_base = run_dice(damfun="Weitzman")
-    c_perturb = run_dice(perturbation_year,damfun="Weitzman")
-  }
+  c_base = run_dice()
+  c_perturb = run_dice(perturbation_year)
   
   ## consumption differences
-  c_diff = (c_base-c_perturb)[-(1:((perturbation_year-2015)/tstep))]
-
-  ## make data
-  data.frame(year = perturbation_year,
-             scc  = sum(c_diff*tstep/(1+discount_rate)^(0:(length(c_diff)-1)*tstep)) * 1e12/1e9/5)
+  c_diff = (c_base$consumption-c_perturb$consumption)[-(1:((perturbation_year-2015)/tstep))]
+  
+  ## recover the scc
+  tibble(year     = perturbation_year,
+         scco2    = sum(c_diff*tstep/(1+discount_rate)^(0:(length(c_diff)-1)*tstep)) * 1e12/1e9/5) ## trillions to dollars, gigatonnes to tonne, divide by timestep
 }
 
 ## function to get the scc path
-get_scc_path = function(damfun, years = seq(2020, 2100, by = 5)) {
-  if (missing(damfun)) {
-    results = NULL
-    for (year in years)
-      results = rbind(results, get_scc(year))
-    return(results)
-  }
-  else if (damfun=="Weitzman") {
-    results = NULL
-    for (year in years)
-      results = rbind(results, get_scc(year, damfun = 'Weitzman'))
-    return(results)
-  }
+get_scc_path = function(years = seq(2020, 2100, by = 10)) {
+  results = tibble()
+  for (year in years)
+    results = 
+      bind_rows(results, 
+                get_scc(year))
+  return(results)
 }
 
 ##########################
 ###############  run model
 ##########################
 
-## Nordhaus (2017) - DICE2016
-results = 
-  get_scc_path() %>%
-  mutate(Damages = "Nordhaus (2017) \nDICE2016")
+## model is in 2010 USD, convert to 2020 USD using the annual BEA Table 1.1.9: https://apps.bea.gov/iTable/iTable.cfm?reqid=19&step=3&isuri=1&select_all_years=0&nipa_table_list=13&series=a&first_year=2020&last_year=2010&scale=-99&categories=survey&thetable=
+pricelevel_2010_to_2020 = 113.648/96.166
 
 ## Weitzman (2012)
-results = 
-  bind_rows(results,
-            get_scc_path(damfun = 'Weitzman') %>%
-              mutate(Damages = "Weitzman (2012)"))
-
-## Howard and Sterner (2017)
-## only market damages
-a2 = 0.003181497
-results = 
-  bind_rows(results,
-            get_scc_path() %>%
-              mutate(Damages = "Howard and Sterner (2017) \nMarket Only"))
-
-## market plus 25% adder for nonmarket
-a2 = 0.003181497 * 1.25
-results = rbind(results,
-                get_scc_path() %>%
-                  mutate(Damages = "Howard and Sterner (2017) \n+ 25% Nonmarket"))
-
-## market and productivity
-a2 = 0.003181497 + 0.003982305
-results = 
-  bind_rows(results,
-            get_scc_path() %>%
-              mutate(Damages = "Howard and Sterner (2017) \n+ Productivity"))
-
-## market and productivity and catastrophic
-a2 = 0.003181497 + 0.003622743 + 0.003982305
-results = 
-  bind_rows(results,
-            get_scc_path() %>%
-              mutate(Damages = "Howard and Sterner (2017) \n+ Productivity \n+ Catastrophic"))
-
-## process
-## inflate from 2010 dollars to 2020: https://apps.bea.gov/iTable/iTable.cfm?reqid=19&step=3&isuri=1&select_all_years=0&nipa_table_list=13&series=a&first_year=2010&last_year=2020&scale=-99&categories=survey&thetable=
-inflator = 113.648/96.166
-results %<>% mutate(scc = scc * inflator)
-
-##########################
-####################  plot
-##########################
-
-## plot
-results$Damages  <- with(results, reorder(Damages, -scc))
-results %>% 
-  filter(year <= 2080) %>% 
-  ggplot() +
-  geom_line(aes(x     = year, 
-                y     = scc, 
-                color = Damages), 
-            size  = 1) +
-  geom_label_repel(aes(x     = case_when(year == 2075 ~ year, TRUE ~ NA_real_),
-                       y     = scc,
-                       color = Damages, 
-                       label = Damages), 
-                   size         = 3,
-                   max.overlaps = 10,
-                   nudge_x      = 10) +
-  geom_segment(aes(x = 2020, xend = 2080, y = 0, yend = 0), color = NA, linetype = 'dashed', size = 0.3) +
-  scale_x_continuous(breaks = seq(2020, 2080, 20), 
-                     limits = c(2020, 2090)) +
-  scale_y_continuous(breaks = seq(0, 1600, 200),
-                     labels = scales::dollar_format()) +
-  scale_color_manual(values = wes_palette(name = "BottleRocket1")) +
-  labs(title = 'SC-CO2 Under DICE2016R Assumptions and 3% Constant Discount Rate',
-       x     = "Emissions Year",
-       y     = "SC-CO2 (2020$)") +
-  theme_minimal() +
-  theme(legend.position  = 'none',
-        legend.title     = element_text(size=14, color='grey20'),
-        legend.text      = element_text(size=14, color='grey20'),
-        legend.key.size  = unit(0.75, 'cm'),
-        legend.margin    = margin(0, 0, 0, 0),
-        axis.title       = element_text(size=14),
-        axis.text        = element_text(size=14),
-        axis.line.x      = element_line(color = "black"),
-        axis.ticks.x     = element_line(color = "black", size=1),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color='grey70', linetype="dotted"),
-        panel.grid.minor = element_blank(),
-        plot.caption     = element_text(size=11, hjust=0.5),
-        plot.title       = element_text(size=14, hjust=0.5)) 
-
-# ## export
-# ggsave('scco2_plot.svg', width = 9, height = 6)
+results_weitzman = 
+  get_scc_path() %>%
+  mutate(scco2 = round(scco2 * pricelevel_2010_to_2020, 0),
+         Damages = 'Weitzman (2012)')
 
 ## end of script, have a great day.

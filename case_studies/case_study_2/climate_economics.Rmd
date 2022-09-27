@@ -9,9 +9,9 @@ linkcolor: blue
 ---
 
 ```{r setup, include = FALSE}
-## This function will check if a package is installed, and if not, install it
+## this function will check if a package is installed, and if not, install it
 list.of.packages <- c('tidyverse',           ## this package is used for data manipulation and management
-                      # 'kable','kableExtra',  ## this package makes nice tables in markdown
+                      'knitr',               ## this package makes nice tables in markdown
                       'ggplot2','ggrepel')   ## these packages provide useful tools for plotting 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.rstudio.com/")
@@ -22,7 +22,7 @@ lapply(list.of.packages, library, character.only = TRUE)
 This markdown document provides instructions and code to estimate a staple Integrated Assessment Model (IAM), the Dynamic Integrated Climate-Economy model (DICE). DICE was originally developed by by 2018 Nobel Laureate [William Nordhaus](https://en.wikipedia.org/wiki/William_Nordhaus) that integrates in the neoclassical economics, carbon cycle, climate science, and estimated impacts allowing the weighing of subjectively guessed costs and subjectively guessed benefits of taking steps to slow climate change.
 
 # Getting Started
-The repository's main [README](README.md) has instructions for installing [*R*](https://www.r-project.org/) and [*RStudio*](https://www.rstudio.com/products/rstudio/), installing [*Github*](https://desktop.github.com/), and cloning the [course repository](https://github.com/bryanparthum/environmental_economics). Please refer to those instructions if you have not done so.
+The repository's main [README](https://github.com/bryanparthum/environmental_economics/blob/main/case_studies/case_study_2/README.md) has instructions for installing [*R*](https://www.r-project.org/) and [*RStudio*](https://www.rstudio.com/products/rstudio/), installing [*Github*](https://desktop.github.com/), and cloning the [course repository](https://github.com/bryanparthum/environmental_economics). Please refer to those instructions if you have not done so.
 
 # The Climate-Economy Model
 To get started with the replication (after installing *R*, *RStudio*, and cloning/downloading the repository), navigate in your file explorer (or equivalent) to `case_studies\case_study_2` and double click on (open) the markdown file `climate_economics.Rmd`. This will prompt your machine to open the file in *RStudio*. This markdown document includes all the instructions and code to estimate a commonly-used Integrated Assessment Model (IAM) DICE2016R as outlined in "[Revisiting the social cost of carbon](https://www.pnas.org/doi/epdf/10.1073/pnas.1609244114)" (Nordhaus 2017). Parameters and functions are drawn directly from the GAMS code for DICE2016R. The model written here does not require any additional solvers as it is not a constrained optimization problem but, instead, a simple representation of the model intended on lowering barriers for first-time users and to serve as an educational tool only.   
@@ -39,21 +39,21 @@ time_horizon = 60
 
   - Answer:
 
-In the next line we define something called `fosslim`. This constraint comes from earlier research suggesting that all of the feasible fossil fuel reserves on the planet sum to approximately 6,000 GtC.
+In the next line we define something called `fosslim`. This constraint comes from earlier research suggesting that all of the feasible fossil fuel reserves on the planet sum to approximately 6,000 gigatonnes of carbon (GtC).
 
 ```{r}
-## availability of fossil fuels
-fosslim  = 6000   # maximum cumulative extraction fossil fuels (GtC)
+## maximum cumulative extraction fossil fuels (GtC)
+fosslim  = 6000
 ```
 
 2. (5 points) Why might it make sense to include a constraint such as this in the model?
 
   - Answer:
- 
+
 The next lines define the preference parameters `elastmu` (elasticity of marginal utility of consumption, often denoted by the greek letter `eta` ($\eta$)) and `prstp` (the social time preference per year, often denoted by the greek letter `rho` ($\rho$)). These two parameters are critical in estimating the present value of future damages (a useful metric for benefit-cost analyses) and are described by many to be the normative or "ethical" parameters in many climate IAMs. While that isn't always the case as they can also be estimated using real-world observations in a positive framework (see, for example [Newell et al. (2022)](https://media.rff.org/documents/Newell_Pizer_Prest_21-16.pdf) for recent advances), it is true that a researcher can "select" different values and have a large effect on the resulting present value. 
 
 ```{r}
-## preferences
+## preference parameters
 elasmu   = 1.45  # elasticity of marginal utility of consumption
 prstp    = .015  # initial rate of social time preference per year
 ```
@@ -65,27 +65,27 @@ Using your understanding of diminishing marginal utilities and intertemporal pre
 3. (5 points) Following standard utility theory, if the marginal utility of consumption should be decreasing in consumption (rich people value an extra dollar less than a poor person), should $\eta$ be greater than or less than 1?
 
   - Answer:
-  
-3. (5 points) The parameter $\eta$ serves two important roles. It captures preferences for current consumption periods, but it also serves as an intertemporal preference parameter. Why might $\eta$ also serve as an intertemporal preference parameter? 
+
+3. (5 points) The parameter $\eta$ serves two important roles. It captures preferences for current consumption periods, but it also serves as an intertemporal preference parameter as we continue into the future. Why might $\eta$ also serve as an intertemporal preference parameter? 
 
   - Answer:
-  
+
 4. (5 points) Is $\rho=0.015$ (or 1.5%) consistent with how you approach your daily decisions? Can you provide some intuition behind why it is likely appropriate to have a $\rho$ greater than 0?
 
   - Answer:
-  
+
 The model continues by defining a bunch of parameters. It is probably useful to walk through the code line-by-line and familiarize yourself with what coding an IAM looks like. Most of the syntax and code is generalizeable to other contexts, so it is good to introduce yourself to these things. The model includes parameters for the socioeconomics (population and growth in gross domestic product), greenhouse gas emissions, the climate module, damage functions, and discounting module. And concludes with a few functions to estimate the social cost of carbon dioxide. In the next section we will run the model, examine the results, make some changes, and compare the outcomes and the model's sensitivities to our assumptions.
 
-## The Social Cost of Carbon Dioxide (SC-CO2) (75 points)
-To recover a social cost of carbon dioxide (SC-CO2) for a given emissions year, the model must first be ran once to estimate the total stream of undiscounted climate damages (this is the baseline model). Then, a researcher adds a pulse of emissions (in this case, 1 gigatonne of $CO_2$) to the emissions in that year and re-estimates the model to recover a new stream of undiscounted damages. By subtracting the two streams of damages (and applying some simple transformations) one can recover an undiscounted stream of marginal damages. "Marginal" in this case to mean damages that are attributable to only the additional 1 tonne pulse of $CO_2$. 
+## The Social Cost of Carbon Dioxide (SC-CO~2~) (75 points)
+To recover a social cost of carbon dioxide (SC-CO~2~) for a given emissions year, the model must first be ran once to estimate the total stream of undiscounted climate damages (this is the baseline model). Then, a researcher adds a pulse of emissions (in this case, 1 gigatonne of $CO_2$) to the emissions in that year and re-estimates the model to recover a new stream of undiscounted damages. By subtracting the two streams of damages (and applying some simple transformations) one can recover an undiscounted stream of marginal damages. "Marginal" in this case to mean damages that are attributable to only the additional 1 tonne pulse of $CO_2$. 
 
 Let's begin by running the model: 
-```{r, warning = F, message = F}
+```{r runmodel, warning = F, message = F, fig.cap=""}
 ## run the model
 source('dice2016.R')
 ```
 
-The model script has returned two objects to our coding environment: 1) an object named `baseline` that contains the baseline temperature trajectories and GDP-loss (climate damages) as a percent of exogenous GDP, and 2) an object names `results` that contains the SC-CO2 in each emissions year from 2020 to 2100 in 10-year intervals. 
+The model script has returned two objects to our coding environment: 1) an object named `baseline` that contains the baseline temperature trajectories and GDP-loss (climate damages) as a percent of exogenous GDP, and 2) an object names `results` that contains the SC-CO~2~ in each emissions year from 2020 to 2100 in 10-year intervals. 
 
 Let's start by taking a look at the baseline climate damages (as a % of exogenous GDP) as a function temperature. This is best examined in a plot: 
 
@@ -117,32 +117,35 @@ baseline %>%
 5. (5 points) The x-axis is the change in global mean surface temperature relative to pre-industrial time (1850-1900). Why would it appear that in the year 2015 the line starts just below the 1 degree mark on the x-axis and not at 0? 
 
   - Answer: 
-  
-6. (5 points) The y-axis is the estimated loss in GDP relative to a world without climate damages. Recent global pledges such as the Paris agreement propose that staying under a 2 degree world is paramount for society and they are willing to go to great lengths to obtain this target. Looking at the plot, what are the estimated damages to GDP if we reached a 2 degree world? 
+
+6. (5 points) The y-axis is the estimated loss in GDP relative to a world without climate damages. Recent global pledges such as the Paris agreement propose that staying under a 2-degree world is paramount for society and they are willing to go to great lengths to obtain this target. Looking at the plot, what are the estimated damages to GDP if we reached a 2-degree world? 
 
   - Answer: 
-  
-7. (5 points) Knowing what we know about losses to GDP in a 2 degree world (your answer from above), do you think these benefits alone justify the costs of reaching a 2 degree world? 
+
+7. (5 points) You have read [Revisiting the social cost of carbon](https://www.pnas.org/doi/epdf/10.1073/pnas.1609244114) which contains the explicit representation of climate damages (the damage function) in equation 3. Using that damage function and the damage parameter coefficients specified in the model (lines 82-85 in `dice2016.R`), estimate exactly the GDP-loss corresponding to a 2-degree world. 
+
+  - Answer: 
+
+8. (5 points) Knowing what we know about losses to GDP in a 2 degree world (your answer from above), do you think these benefits alone justify the costs of maintaining a 2-degree world? 
 
   - Answer:
-  
-8. (5 points) You have read [Revisiting the social cost of carbon](https://www.pnas.org/doi/epdf/10.1073/pnas.1609244114) which contains the explicit representation of climate damages (the damage function) in equation 3. Using that damage function and the damage parameter coefficients specified in the model (lines 82-85 in `dice2016.R`), estimate exactly the GDP-loss corresponding to a 2 degree world. 
 
-  - Answer: 
-  
-9. (10 points) The damage function has received a lot of criticism. Provide some arguments both for and against its use in informing environmental policy. 
+9. (10 points) The damage function in this model has received a lot of criticism. Provide some arguments both for and against its use in informing environmental policy. 
 
   - Answer: 
 
+From running the model (`dice2016.R`), we also have a path of SC-GHGs in an object named `results`. Lets take a look at those in a table: 
 
-We now have a path of SC
 ```{r}
-knitr::kable(results[, c('year', 'scco2')], 
-             digits    = 0, 
-             col.names = c('Emissions Year', 'SC-CO2'))
+kable(results[, c('year', 'scco2')],              # the object we want in the table
+      col.names = c('Emissions Year', 'SC-CO~2~'),# custom column names
+      align     = c('c', 'c'),                    # alignment of columns, 'c' = center
+      digits    = 0)                              # round to the nearest integer
 ```
 
-```{r, echo = F, warning = F, fig.cap="\\label{fig:scco2_dice2016}The SC-CO2 at a 3% Discount Rate"} 
+The social cost of carbon appears to increase over time (holding prices and dollars constant). It might also be helpful to take a look at the SC-CO~2~ path in a plot. 
+
+```{r, echo = F, warning = F, fig.cap="\\label{fig:scco2_dice2016}The SC-CO~2~ at a 3% Discount Rate"} 
 ## plot
 results %>%
   ggplot() +
@@ -164,7 +167,7 @@ results %>%
                      limits = c(0, 350),
                      labels = scales::dollar_format()) +
   labs(x     = 'Emissions Year',
-       y     = 'SC-CO2 (2020$)') +
+       y     = bquote('SC-'*CO[2]~ '(2020$)')) +
   theme_minimal() +
   theme(legend.position  = 'none',
         axis.title       = element_text(size = 14),
@@ -175,3 +178,174 @@ results %>%
         panel.grid.major.y = element_line(color = 'grey70', linetype = "dotted"),
         panel.grid.minor = element_blank())
 ```
+
+10. (5 points) What is the growth rate of the SC-CO~2~ as estimated by this model? Provide one or two reasons why we would expect the SC-CO~2~ to increase over time. 
+
+  - Answer:
+
+In the climate economics literature, particularly when it comes to estimating SC-GHGs, we often hear that the discount rate is one of the major drivers of the magnitude of the SC-GHG. While many have claimed that the discount rate is a normative intervention in climate economy models, recent literature has advanced positive methods to estimate the discount rate ([Newell et al. 2022](https://media.rff.org/documents/Newell_Pizer_Prest_21-16.pdf)). In the model we have ran here, line 276 in `dice2016.R` specifies the discount rate that is used to discount the stream of damages into the future back to the year of emissions. 
+
+```
+## function to get the scc
+get_scc = function(perturbation_year, discount_rate = 0.03) 
+```
+
+The `0.03` denotes a constant (time-invariant) discount rate of 3%. Recent papers (for example, [Bauer and Rudebusch 2021](https://www.frbsf.org/economic-research/publications/working-papers/2020/25/)) have suggested that the consumption rate of discount is more likely near 2%. I've made this change for you (`discount_rate = 0.02`) in a second model file named `dice2016_02.R` that produces a new object `results_02`. Let's estimate the model with the new discount rate:  
+
+```{r runmodel_02, warning = F, message = F, fig.cap=""}
+## run the model
+source('dice2016_02.R')
+```
+
+Let's take a look at the results in a figure: 
+
+```{r, echo = F, warning = F, fig.cap="\\label{fig:scco2_dice2016_02}The SC-CO~2~ at 2% and 3% Discount Rates"} 
+## plot
+ggplot() +
+  geom_line(data = results,
+            aes(x     = year,
+                y     = scco2,
+                color = Damages),
+            size  = 1) +
+    geom_line(data = results_02,
+            aes(x     = year,
+                y     = scco2,
+                color = Damages),
+            size  = 1) +
+  geom_label_repel(data = results,
+                   aes(x     = case_when(year == 2100 ~ year, TRUE ~ NA_real_),
+                       y     = scco2,
+                       color = Damages,
+                       label = Damages),
+                   size         = 3,
+                   max.overlaps = 10,
+                   nudge_x      = 10) +
+    geom_label_repel(data = results_02,
+                   aes(x     = case_when(year == 2100 ~ year, TRUE ~ NA_real_),
+                       y     = scco2,
+                       color = Damages,
+                       label = Damages),
+                   size         = 3,
+                   max.overlaps = 10,
+                   nudge_x      = 10) +
+  geom_segment(aes(x = 2020, xend = 2100, y = 0, yend = 0), color = NA, linetype = 'dashed', size = 0.3) +
+  scale_x_continuous(breaks = seq(2020, 2100, 20),
+                     limits = c(2020, 2100)) +
+  scale_y_continuous(breaks = seq(0, 675, 75),
+                     limits = c(0, 675),
+                     labels = scales::dollar_format()) +
+  labs(x     = 'Emissions Year',
+       y     = bquote('SC-'*CO[2]~ '(2020$)')) +
+  theme_minimal() +
+  theme(legend.position  = 'none',
+        axis.title       = element_text(size = 14),
+        axis.text        = element_text(size = 14),
+        axis.line.x      = element_line(color = "black"),
+        axis.ticks.x     = element_line(color = "black", size=1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = 'grey70', linetype = "dotted"),
+        panel.grid.minor = element_blank())
+```
+
+Wow! As we can see, a seemingly minor adjustment in the discount rate has quite an effect on the resulting SC-CO~2~. 
+
+11. (10 points) Recognizing that this is an important component of the SC-CO~2~, provide a reason for why having a empirically-estimated (positive) discount rate could be advantageous when designing environmental policy (hint: it might be helpful to keep in mind the ebb and flow of administrations and the need for resiliant and defensible environmental policy). 
+
+  - Answer:
+
+## Updating the DICE Damage Funtion to Weitzman (2012) (20 points for coding, 10 points for the answer)
+The late great [Prof. Marty Weitzman](https://en.wikipedia.org/wiki/Martin_Weitzman) was a giant in the climate economics literature. He encouraged people tp think hard about difficult topics, particularly when it comes to accounting for risk and "fat tails" in climate-related damages. While his work is vast, in a paper titled [GHG Targets as Insurance Against Catastrophic Climate Damages](https://scholar.harvard.edu/files/weitzman/files/ghgtargetsinsuranceagainst.pdf) in 2012 he suggested altering the DICE damage function to help account for the potentially disastrous environmental outcomes from high warming scenarios, hedging against the unkown unkowns of the climate-economy relationship. His recommended modification was the second expression (the first expression is the base dice damage function): 
+
+$$
+\Delta GDP = \beta_1\Delta GMST + \beta_2\Delta GMST^2 + \beta_4\Delta GMST^{6.754} 
+$$
+
+where $\beta_1 = 0$, $\beta_2 = 0.00236$, and  $\beta_4 = 0.00000507$. One inconvenient "problem" is that by simply adding this extra expression that represents higher levels of damages when $\Delta GMST> \approx6$, the model predicts 100% losses in GDP (global collapse, oops). So, we need to make a minor transformation that simply constrains the damages to be between 0% and 100% ($damfrac \in [0,1)$). Open up the file `dice2016_weitzman.R` and go to line 214. It currently reads:
+
+```
+## equation for damage fraction
+damfrac[t] = a1*tatm[t] + a2*tatm[t]^a3
+```
+
+This is the basic DICE damage function from Nordhaus (2017). Make the modification to this damage function as proposed by Weitzman (2012), along with the necessary log-transformation to constrain damages to be between 0% and 100% of GDP. Letting $D(t)$ denote Weitzman's damage function above, this will look like:
+
+$$
+damfrac[t] = \frac{D(t)}{(1 + D(t))}
+$$
+Save your changes, change the option in the following code chunk from `eval = FALSE` to `eval = TRUE`, and estimate the model.
+
+```{r runmodel_weitzman, eval = FALSE}
+## run the model
+source('dice2016_weitzman.R')
+```
+
+Take a look at the new results object `results_weitzman` by plotting the path of the SC-CO~2~ alongside the other two Nordhaus results. First change the option in the following code chunk from `eval = FALSE` to `eval = TRUE` and `knit` the markdown document.
+
+```{r, eval = FALSE, echo = F, warning = F, fig.cap="\\label{fig:scco2_dice2016_weitzman}The SC-CO~2~ including Weitzman (2012)"} 
+## plot
+ggplot() +
+  geom_line(data = results,
+            aes(x     = year,
+                y     = scco2,
+                color = Damages),
+            size  = 1) +
+  geom_line(data = results_02,
+            aes(x     = year,
+                y     = scco2,
+                color = Damages),
+            size  = 1) +
+    geom_line(data = results_weitzman,
+            aes(x     = year,
+                y     = scco2,
+                color = Damages),
+            size  = 1) +
+  geom_label_repel(data = results,
+                   aes(x     = case_when(year == 2100 ~ year, TRUE ~ NA_real_),
+                       y     = scco2,
+                       color = Damages,
+                       label = Damages),
+                   size         = 3,
+                   max.overlaps = 10,
+                   nudge_x      = 10) +
+  geom_label_repel(data = results_02,
+                   aes(x     = case_when(year == 2100 ~ year, TRUE ~ NA_real_),
+                       y     = scco2,
+                       color = Damages,
+                       label = Damages),
+                   size         = 3,
+                   max.overlaps = 10,
+                   nudge_x      = 10) +
+    geom_label_repel(data = results_weitzman,
+                   aes(x     = case_when(year == 2100 ~ year, TRUE ~ NA_real_),
+                       y     = scco2,
+                       color = Damages,
+                       label = Damages),
+                   size         = 3,
+                   max.overlaps = 10,
+                   nudge_x      = 10) +
+  geom_segment(aes(x = 2020, xend = 2100, y = 0, yend = 0), color = NA, linetype = 'dashed', size = 0.3) +
+  scale_x_continuous(breaks = seq(2020, 2100, 20),
+                     limits = c(2020, 2100)) +
+  scale_y_continuous(breaks = seq(0, 2400, 200),
+                     limits = c(0, 2400),
+                     labels = scales::dollar_format()) +
+  labs(x     = 'Emissions Year',
+       y     = bquote('SC-'*CO[2]~ '(2020$)')) +
+  theme_minimal() +
+  theme(legend.position  = 'none',
+        axis.title       = element_text(size = 14),
+        axis.text        = element_text(size = 14),
+        axis.line.x      = element_line(color = "black"),
+        axis.ticks.x     = element_line(color = "black", size=1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = 'grey70', linetype = "dotted"),
+        panel.grid.minor = element_blank())
+```
+
+12. (5 points) In 1 to 3 sentences, provide an argument that supports using the basic Nordhaus damage function in federal benefit-cost analyses of government programs (hint: think back to a discussion we had about defensive behaviors and the advantage of using lower bound benefits estimates in analyses). 
+
+  - Answer:
+  
+13. (5 points) Now, in 1 to 3 sentences, provide an argument _in favor_ of using the Weitzman damage function (instead of the basic Nordhaus damage function) in federal benefit-cost analyses (hint: this argument could be similar to the one made by Weitzman (2012)). 
+
+  - Answer:
