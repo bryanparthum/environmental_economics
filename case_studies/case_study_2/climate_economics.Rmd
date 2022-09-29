@@ -62,11 +62,8 @@ Recall from your introductory economics courses that the elasticity of the margi
 
 Using your understanding of diminishing marginal utilities and intertemporal preferences, answer the following questions: 
 
-3. (5 points) Following standard utility theory, if the marginal utility of consumption should be decreasing in consumption (rich people value an extra dollar less than a poor person), should $\eta$ be greater than or less than 1?
 
-  - Answer:
-
-3. (5 points) The parameter $\eta$ serves two important roles. It captures preferences for current consumption periods, but it also serves as an intertemporal preference parameter as we continue into the future. Why might $\eta$ also serve as an intertemporal preference parameter? 
+3. (10 points) The parameter $\eta$ serves two important roles. It captures preferences for current consumption periods, but it also serves as an intertemporal preference parameter as we continue into the future. Why might $\eta$ also serve as an intertemporal preference parameter? 
 
   - Answer:
 
