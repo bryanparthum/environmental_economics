@@ -127,7 +127,7 @@ baseline %>%
 
   - Answer:
 
-9. (10 points) The damage function in this model has received a lot of criticism. Provide some arguments both for and against its use in informing environmental policy. 
+9. (10 points) The damage function in this model has received a lot of criticism for being very conservative (i.e., damages are likely much larger). Provide some arguments both for and against its use in informing environmental policy. 
 
   - Answer: 
 
@@ -246,12 +246,12 @@ ggplot() +
 
 Wow! As we can see, a seemingly minor adjustment in the discount rate has quite an effect on the resulting SC-CO~2~. 
 
-11. (10 points) Recognizing that this is an important component of the SC-CO~2~, provide a reason for why having a empirically-estimated (positive) discount rate could be advantageous when designing environmental policy (hint: it might be helpful to keep in mind the ebb and flow of administrations and the need for resiliant and defensible environmental policy). 
+11. (10 points) Recognizing that this is an important component of the SC-CO~2~, provide a reason for why having a empirically-estimated (positive) discount rate could be advantageous when designing environmental policy (hint: it might be helpful to keep in mind the ebb and flow of administrations and the need for resilient and defensible environmental policy). 
 
   - Answer:
 
 ## Updating the DICE Damage Funtion to Weitzman (2012) (20 points for coding, 10 points for the answer)
-The late great [Prof. Marty Weitzman](https://en.wikipedia.org/wiki/Martin_Weitzman) was a giant in the climate economics literature. He encouraged people tp think hard about difficult topics, particularly when it comes to accounting for risk and "fat tails" in climate-related damages. While his work is vast, in a paper titled [GHG Targets as Insurance Against Catastrophic Climate Damages](https://scholar.harvard.edu/files/weitzman/files/ghgtargetsinsuranceagainst.pdf) in 2012 he suggested altering the DICE damage function to help account for the potentially disastrous environmental outcomes from high warming scenarios, hedging against the unkown unkowns of the climate-economy relationship. His recommended modification was the second expression (the first expression is the base dice damage function): 
+The late great [Prof. Marty Weitzman](https://en.wikipedia.org/wiki/Martin_Weitzman) was a giant in the climate economics literature. He encouraged people tp think hard about difficult topics, particularly when it comes to accounting for risk and "fat tails" in climate-related damages. While his work is vast, in a paper titled [GHG Targets as Insurance Against Catastrophic Climate Damages](https://scholar.harvard.edu/files/weitzman/files/ghgtargetsinsuranceagainst.pdf) in 2012 he suggested altering the DICE damage function to help account for the potentially disastrous environmental outcomes from high warming scenarios, hedging against the unknown unknowns of the climate-economy relationship. His recommended modification was the second expression (the first expression is the base dice damage function): 
 
 $$
 \Delta GDP = \beta_1\Delta GMST + \beta_2\Delta GMST^2 + \beta_4\Delta GMST^{6.754} 
