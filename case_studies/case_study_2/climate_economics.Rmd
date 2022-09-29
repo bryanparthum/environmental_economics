@@ -339,10 +339,6 @@ ggplot() +
         panel.grid.minor = element_blank())
 ```
 
-12. (5 points) In 1 to 3 sentences, provide an argument that supports using the basic Nordhaus damage function in federal benefit-cost analyses of government programs (hint: think back to a discussion we had about defensive behaviors and the advantage of using lower bound benefits estimates in analyses). 
-
-  - Answer:
-  
-13. (5 points) Now, in 1 to 3 sentences, provide an argument _in favor_ of using the Weitzman damage function (instead of the basic Nordhaus damage function) in federal benefit-cost analyses (hint: this argument could be similar to the one made by Weitzman (2012)). 
+12. (10 points) Think back to question 9 where you provided arguments both for and against using the basic Nordhaus damage function in benefit-cost analyses. Now, provide and argument why having a second damage function such as the Weitzman damage function would be informative for generating environmental policy. 
 
   - Answer:
