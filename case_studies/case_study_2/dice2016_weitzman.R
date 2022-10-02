@@ -189,6 +189,7 @@ run_dice = function(perturbation_year = -1) {
   ## miu[t]          emission control rate ghgs
   
   ## intialize space for state variables and set starting values
+  dam       = array(NA,      time_horizon)
   damfrac   = array(NA,      time_horizon)
   ygross    = array(NA,      time_horizon)
   ynet      = array(NA,      time_horizon)
@@ -211,7 +212,8 @@ run_dice = function(perturbation_year = -1) {
   for (t in 1:time_horizon) {
     
     ## equation for damage fraction
-    damfrac[t] = a1*tatm[t]+a2*tatm[t]^a3
+    dam[t]     = a1*tatm[t] + a2*tatm[t]^a3
+    damfrac[t] = dam[t]/(1 + dam[t])
     
     ## output gross equation
     ygross[t] = (al[t]*(l[t]/1000)^(1-gama))*(k[t]^gama)

@@ -58,7 +58,7 @@ elasmu   = 1.45  # elasticity of marginal utility of consumption
 prstp    = .015  # initial rate of social time preference per year
 ```
 
-Recall from your introductory economics courses that the elasticity of the marginal utility of consumption $\eta$ traces out the path of the utility gained from an extra unit of consumption. When that elasticity is equal to one ("unity"), a richer person benefits from an additional unit of consumption the same as a poorer person. The pure rate of time preference parameter $\rho$ dictates the degree to which we value the current more than the future. 
+Recall from your introductory economics courses that the elasticity of the marginal utility of consumption $\eta$ traces out the path of the utility gained from an extra unit of consumption. The pure rate of time preference parameter $\rho$ dictates the degree to which we value the current more than the future. 
 
 Using your understanding of diminishing marginal utilities and intertemporal preferences, answer the following questions: 
 
