@@ -1,7 +1,5 @@
 # Case Study #4 - Bivariate Mapping
-This repository provides instructions and code to estimate a staple Integrated Assessment Model (IAM), the Dynamic Integrated Climate-Economy model (DICE). DICE was originally developed by by 2018 Nobel Laureate [William Nordhaus](https://en.wikipedia.org/wiki/William_Nordhaus) that integrates in the neoclassical economics, carbon cycle, climate science, and estimated impacts allowing the weighing of subjectively guessed costs and subjectively guessed benefits of taking steps to slow climate change.
-
-The version of the model used in this repository is DICE2016R as outlined in "[Revisiting the social cost of carbon](case_studies/case_study_2/papers/Nordhaus_2017_PNAS-DICE2016.pdf)" (Nordhaus 2017). Parameters and functions are drawn directly from the GAMS code for DICE2016R. The model written here does not require any additional solvers as it is not a constrained optimization problem but, instead, a simple representation of the model geared towards first-time users.   
+This repository provides instructions and code to create a simple bivariate map of drinking water quality and demographic characteristics for the state of Texas. 
 
 # Install R and RStudio
 This case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* provides a welcoming environment (an integrated development environment, or IDE) that is useful for replication and allows use of the *Rmarkdown* functionality. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
