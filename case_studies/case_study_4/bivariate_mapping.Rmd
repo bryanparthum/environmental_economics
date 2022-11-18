@@ -9,6 +9,8 @@ linkcolor: blue
 ---
 
 ```{r setup, include = FALSE}
+## This command just removes warnings and other messages. 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ## this function will check if a package is installed, and, if not, install it
 list.of.packages <- c("knitr","magrittr","tinytex","cowplot","haven",
                       "sf","tidyverse","sp","areal","stringr", 
@@ -20,7 +22,7 @@ lapply(list.of.packages, library, character.only = TRUE)
 ```
 
 # Case Study #4 - Bivariate Mapping (100 points)
-This markdown document provides instructions, code, and data to create a bivariate map of environmental quality indicators and alongside demographic information. We will be using data from the 2020 5-year ACS and Texas's Drinking Water Watch website. 
+This markdown document provides instructions, code, and data to create a bivariate map of environmental quality indicators and demographic information. We will use data from the 2020 5-year ACS and [Texas's Drinking Water Watch website](https://dww2.tceq.texas.gov/DWW/). 
 
 # Getting Started
 The repository's main [README](https://github.com/bryanparthum/environmental_economics/blob/main/case_studies/case_study_4/README.md) has instructions for installing [*R*](https://www.r-project.org/) and [*RStudio*](https://www.rstudio.com/products/rstudio/), installing [*Github*](https://desktop.github.com/), and cloning the [course repository](https://github.com/bryanparthum/environmental_economics). Please refer to those instructions if you have not done so.
@@ -30,7 +32,7 @@ You can run individual code sections or lines by navigating into any code sectio
 Running individual lines is useful when testing the commands, but the entire markdown document (compete with code chunks) is ran by hitting the `Knit` button at the top of the page (this is called "knitting"). When you `knit` a document, it will run all the text and all the code and populate a output file (in this case, a .pdf). **This output file is what you will submit for your case study.**
 
 # The Bivariate Map
-To get started with the replication (after installing *R*, *RStudio*, and cloning/downloading the repository), navigate in your file explorer (or equivalent) to `case_studies\case_study_4` and double click on (open) the markdown file `bivariate_mapping.Rmd`. This will prompt your machine to open the file in *RStudio*. This markdown document includes all the instructions and code to create a bivariate map. 
+To get started with the assignment (after installing *R*, *RStudio*, and cloning/downloading the repository), navigate in your file explorer (or equivalent) to `case_studies\case_study_4` and double click on (open) the markdown file `bivariate_mapping.Rmd`. This will prompt your machine to open the file in *RStudio*. This markdown document includes all the instructions and code to create a bivariate map. 
 
 ## Opening the data (20 points)
 Let's start by opening the simplest file, an R dataframe of census information. These are census tract-level variables pulled from the 2020 5-year American Community Survey. 
@@ -39,9 +41,12 @@ Important note, you will need to change the directory below to your working fold
 
 ```{r load-data}
 
-## load data
+# Set your working directory
 my_wd <- 'D:/Dropbox (Personal)/Teaching Materials/Econ 475 Environmental Economics/case_studies/case_study_4/'
+
+# Load the census data
 load(paste0(my_wd,'tx_census.RData'))
+
 ```
 
 1. (10 points) List one variable that might be used to characterize an indicator of social vulnerability.
@@ -49,28 +54,32 @@ load(paste0(my_wd,'tx_census.RData'))
   - Answer:
 
 
-Next , we're going to load water system service boundary shapefiles for the state of Texas. This data comes pre-merged with average concentrations of all finished water samples from 2012-2020 in a given water system for four specific water quality analytes. Note that the average concentration from 2012-2020 does not necessarily reflect current conditions, and averages are sensitive to extreme values. 
+Next, we're going to load water system service boundary shapefiles for the state of Texas. This data comes pre-merged with average concentrations of all finished water samples from 2012-2020 in a given water system for four specific water quality analytes. Note that the average concentration from 2012-2020 does not necessarily reflect current conditions, and averages are sensitive to extreme values. 
 
 ```{r load sf data}
-## turning off messages in the markdown document
+
+# Load the simple feature (shapefile) data using st_read
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 tx_water <- st_read(paste0(my_wd,'tx_water.shp'))
+
 ```
 
 
-2. (10 points) This dataset includes information on four water quality parameters. List the parameters. 
+2. (10 points) This dataset includes information on four water quality parameters. List the water quality parameters. 
 
   - Answer:
 
 
 ## Inspecting the Data (20 points)
 
-Before we can make a bi-variate map, we first need to combine water system service boundaries with census information. 
+Before we can make a bivariate map, we first need to combine water system service boundaries with census information. 
 
 3. (10 points) First, let's take a look at the service boundaries to ensure they were imported correctly. 
 
 ```{r map service boundaries}
+
 mapview(tx_water)
+
 ```
 
 Looks like these were imported successfully. 
@@ -79,12 +88,12 @@ Looks like these were imported successfully.
 
 
 ```{r map population data}
-## turning off messages in the markdown document
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+
 # Define a color pallette for the map 
 pal <- colorNumeric(palette = "viridis",
                     domain = tx_census$pop,
                     na.color = 'whitesmoke' )
+
 # Map Texas population across census tracts. 
 tx_census %>%
   st_transform(crs = "+init=epsg:4326") %>%
@@ -100,8 +109,9 @@ tx_census %>%
             values = ~ pop,
             title = "Population",
             opacity = 1)
-```
 
+```
+Everything checks out here as well. Population seems concentrated in the east and southeast of the state, which is what we might expect. 
 
 ## Areal apportionment (25 points)
 
@@ -110,9 +120,9 @@ tx_census %>%
 We're going to use an areal apportionment procedure to combine these two unique sets of data. Note that this step may take a few minutes.  
 
 ```{r areal apportionment commands}
-## turning off messages in the markdown document
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
-#Areally interpolate water system information to census tracts
+
+# Areally interpolate water system information to census tracts
+
 tx_tract_interpolated <- aw_interpolate(tx_census,
                                       tid = GEOID,
                                       source = tx_water,
@@ -129,25 +139,23 @@ sum(is.na(tx_tract_interpolated$tthm))
 (a) (5 points) Some census tracts do not have water quality samples. Given the output from the above command, how many census tracts do not have any total trihalomethane (TTHM) quality information?
   - Answer: 
 
-(b) (10 points) We used the intensive option to join water system information to tracts. This contrasts with the extensive option in the same command. Use the $?aw_interpolate$ command to view the help file for this command, and then explain why the intensive option was the correct approach.
+(b) (10 points) We used the intensive option to join water system information to census tracts. This contrasts with the extensive option that could have been used with the same command. Use the '?aw_interpolate' query to view the help file for this command, and then explain why the intensive option was the correct approach.
   - Answer: 
 
-(c) (10 points) Areal apportionment is valuable when a specific geographic unit does not perfectly correspond to census divisions or geographic units over which population information is available. This works well in our case because water service boundaries do not correspond to census tract boundaries. Provide one other example where this procedure might be useful. 
+(c) (10 points) Areal apportionment is valuable when a specific geographic unit does not perfectly overlap with census divisions or other geographic units over which population information is available. This works well in our case because water service boundaries do not correspond to census tract boundaries. Provide one other example where this procedure might be useful. 
   - Answer: 
 
 
 
 ## Bivariate Map (35 points)
 
-Finally, we can prepare to make our bivariate map. A bivariate map jointly displays two variables in a way that facilitates easy location of areas that are tend to have high (or low) values for both indicators simultaneously. This map generation will make use of the biscale package, which has been used to generate visuals in your class readings. 
+Finally, we can prepare to make our bivariate map. A bivariate map jointly displays two variables in a way that facilitates easy location of areas that tend to have high (or low) values for both indicators simultaneously. This map generation will make use of the biscale package, which has been used to generate visuals in your class readings. 
 
-In this case, we're going to plot one of our drinking water indicators alongside a population metric. You can pick other combinations of variables here, but the code below generates a map of % minority plotted against average total trihalomethane (TTHM) concentrations. Recall that TTHM is the most common class of disinfectant byproducts in finished drinking water.   
+In this example, we plot one of our drinking water indicators alongside a population metric. You can pick other combinations of variables here if you would like, but the code below generates a map of % minority plotted against average total trihalomethane (TTHM) concentrations. Recall that TTHMs are the most common class of disinfectant byproducts in finished drinking water.   
 
 First, create the dimensions of the categories for each bin. This command splits up all census tracts into 9 categories corresponding to the lowest third, middle third, and highest third of the TTHM distribution and does the same for the % minority distribution. 3 categories times 3 categories is 9 total combinations of TTHM and percent low income.  
 
 ```{r create bivariate bins }
-## turning off messages in the markdown document
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 
 data_biscale <- bi_class(tx_tract_interpolated, 
                          x = tthm, 
@@ -162,7 +170,7 @@ data_biscale <- bi_class(tx_tract_interpolated,
 And, finally, we can generate the bivariate map for the state of Texas.
 
 ```{r bivariate map }
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+
 # This step generates the map's information. 
 map <- ggplot(data_biscale) +
   geom_sf(data = data_biscale, mapping = aes(fill = bi_class), 
