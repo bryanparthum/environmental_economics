@@ -19,6 +19,9 @@ list.of.packages <- c("knitr","magrittr","tinytex","cowplot","haven",
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.rstudio.com/")
 lapply(list.of.packages, library, character.only = TRUE)
+
+## leaflet is an html-based widget, to knit to a static pdf, phantonjs allows markdown to take a screenshot of the interactive
+webshot::install_phantomjs()
 ```
 
 # Case Study #4 - Bivariate Mapping (100 points)
@@ -40,12 +43,8 @@ Let's start by opening the simplest file, an R dataframe of census information. 
 Important note, you will need to change the directory below to your working folder (wherever you saved the materials for this case study).
 
 ```{r load-data}
-
-# Set your working directory
-my_wd <- 'D:/Dropbox (Personal)/Teaching Materials/Econ 475 Environmental Economics/case_studies/case_study_4/'
-
 # Load the census data
-load(paste0(my_wd,'tx_census.RData'))
+load('tx_census.RData')
 
 ```
 
@@ -60,8 +59,7 @@ Next, we're going to load water system service boundary shapefiles for the state
 
 # Load the simple feature (shapefile) data using st_read
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
-tx_water <- st_read(paste0(my_wd,'tx_water.shp'))
-
+tx_water <- st_read('tx_water.shp')
 ```
 
 
