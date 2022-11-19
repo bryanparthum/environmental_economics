@@ -153,7 +153,7 @@ Finally, we can prepare to make our bivariate map. A bivariate map jointly displ
 
 In this example, we plot one of our drinking water indicators alongside a population metric. You can pick other combinations of variables here if you would like, but the code below generates a map of % minority plotted against average total trihalomethane (TTHM) concentrations. Recall that TTHMs are the most common class of disinfectant byproducts in finished drinking water.   
 
-First, create the dimensions of the categories for each bin. This command splits up all census tracts into 9 categories corresponding to the lowest third, middle third, and highest third of the TTHM distribution and does the same for the % minority distribution. 3 categories times 3 categories is 9 total combinations of TTHM and percent low income.  
+First, create the dimensions of the categories for each bin. This command splits up all census tracts into 9 categories corresponding to the lowest third, middle third, and highest third of the TTHM distribution and does the same for the % minority distribution. 3 categories times 3 categories is 9 total combinations of TTHM and % minority.  
 
 ```{r create bivariate bins }
 
