@@ -1,5 +1,5 @@
 # Case Study #4 - Bivariate Mapping
-This repository provides instructions and code to create a simple bivariate map of drinking water quality and demographic characteristics for the state of Texas. 
+This repository sub-folder provides instructions and code to create a simple bivariate map of drinking water quality and demographic characteristics for the state of Texas. 
 
 # Install R and RStudio
 This case study requires the use of the *R* programming language. *R* is free and available for download [here](https://www.r-project.org/). While you can use *R* on it's own, downloading *RStudio* provides a welcoming environment (an integrated development environment, or IDE) that is useful for replication and allows use of the *Rmarkdown* functionality. It is free and available for download [here](https://www.rstudio.com/products/rstudio/).
