@@ -40,8 +40,6 @@ To get started with the assignment (after installing *R*, *RStudio*, and cloning
 ## Opening the data (20 points)
 Let's start by opening the simplest file, an R dataframe of census information. These are census tract-level variables pulled from the 2020 5-year American Community Survey. 
 
-Important note, you will need to change the directory below to your working folder (wherever you saved the materials for this case study).
-
 ```{r load-data}
 # Load the census data
 load('tx_census.RData')
